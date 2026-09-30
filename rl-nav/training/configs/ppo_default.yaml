@@ -1,0 +1,32 @@
+# PPO hyperparameters + env/training params for train_ppo.py
+# Defaults chosen for a small MLP on a low-dimensional obs (28-d) — env stepping is the
+# bottleneck, not network size, so keep the net small and lean on parallel CPU envs instead.
+
+run_name: ppo_fastnav_v0
+
+env:
+  n_envs: 16              # matches logical core count; tune down if the machine is busy
+  seed_range: [0, 800000] # training maps draw seeds from this range
+  randomize: true
+
+ppo:
+  policy: MlpPolicy
+  policy_kwargs:
+    net_arch: [64, 64]
+  n_steps: 2048            # per env, per rollout -> batch = n_steps * n_envs
+  batch_size: 2048
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  ent_coef: 0.0
+  learning_rate: 0.0003
+  max_grad_norm: 0.5
+  vf_coef: 0.5
+
+training:
+  total_timesteps: 5000000
+  eval_freq: 50000          # env steps between eval rollouts (aggregated across n_envs)
+  n_eval_episodes: 50
+  checkpoint_freq: 250000
+  seed: 42
